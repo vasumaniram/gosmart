@@ -1,0 +1,136 @@
+
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * A business network for shipping perishable goods
+ * The cargo is temperature controlled and contracts
+ * can be negociated based on the temperature
+ * readings received for the cargo
+ */
+
+namespace com.bookgo.shipping
+
+/**
+ * The type of perishable product being shipped
+ */
+enum ProductType {
+  o AUTO
+  o ELECTRONICS
+  o OTHERS
+}
+
+enum SupplierCompany {
+  o TVS
+  o PROCONNECT
+  o EXPEDITOR
+}
+
+/**
+ * The status of a shipment
+ */
+enum ShipmentStatus {
+  o CREATED
+  o IN_TRANSIT
+  o ARRIVED
+}
+
+/**
+ * Contract Status Types
+ */
+enum ContractStatus {
+  o REQUESTED
+  o APPROVED
+  o REJECTED
+}
+
+
+/**
+ * An abstract transaction that is related to a Shipment
+ */
+abstract transaction ShipmentTransaction {
+  --> Shipment shipment
+}
+
+/**
+ * A notification that a shipment has been received by the
+ * importer and that funds should be transferred from the importer
+ * to the grower to pay for the shipment.
+ */
+transaction ShipmentReceived extends ShipmentTransaction {
+}
+
+/**
+ * A shipment being tracked as an asset on the ledger
+ */
+asset Shipment identified by shipmentId {
+  o String shipmentId
+  o String from
+  o String to
+  o DateTime startTime
+  o DateTime endTime
+  o SupplierCompany company
+  o Double settlementAmount
+  o ProductType type
+  o ShipmentStatus status
+  --> Contract contract
+}
+
+/**
+ * Defines a contract between a FleetManagementCompany and the Supplier to ship using
+ * a Shipper, paying a set unit price. 
+ */
+asset Contract identified by contractId {
+  o String contractId
+  --> FleetManagementCompany fleetManagementCompany
+  --> Supplier supplier
+  --> Bank bank
+  o DateTime arrivalDateTime
+  o Double settlementAmount
+  o ContractStatus ctrStatus
+}
+
+
+/**
+ * An abstract participant type in this business network
+ */
+abstract participant Business identified by email {
+  o String email
+}
+
+/**
+ * A FleetManagementCompany is a type of participant in the network
+ */
+participant FleetManagementCompany extends Business {
+    o Double accountBalance
+}
+
+
+/**
+ * A Shipper is a type of participant in the network
+ */
+participant Supplier extends Business {
+}
+
+/**
+ * An Importer is a type of participant in the network
+ */
+participant Bank extends Business {
+}
+
+/**
+ * JUST FOR INITIALIZING A DEMO
+ */
+transaction SetupDemo {
+}
